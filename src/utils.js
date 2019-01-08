@@ -7,7 +7,7 @@ var utils = {
     }
     return obj1;
   },
-  addLoadEvent(func) {
+  addLoadEvent:function(func) {
     var oldonload = window.onload;
     if (typeof window.onload != 'function') {
       window.onload = func;

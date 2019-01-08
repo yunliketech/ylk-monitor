@@ -16,10 +16,6 @@ var ylkMonitor = (function () {
             this.submit_log.push(item);
             this.report();
         };
-        // item={
-        //     type:'performance/error/api/resource'
-        //     data
-        // }
 
         this.report = function () {
 
@@ -45,11 +41,13 @@ var ylkMonitor = (function () {
             }
         };
 
-        this.submit = function () {
+        this.submit = function (data_log) {
             var _this = this;
+            
             var data = {
                 device: null,
-                log: this.submit_log,
+                
+                log: data_log?data_log:this.submit_log,//如果data_log存在，则直接上报，如果不存在，上报submit_log
                 time: new Date().getTime()
             };
 
@@ -66,7 +64,11 @@ var ylkMonitor = (function () {
             //发送请求
             xhr.send(JSON.stringify(data));
 
-            _this.submit_log = [];
+            if(!data_log){
+                // 清空队列
+               _this.submit_log = [];
+            }
+            
             xhr.onreadystatechange = function () {
             };
         };
@@ -89,7 +91,7 @@ var ylkMonitor = (function () {
         }
         return obj1;
       },
-      addLoadEvent(func) {
+      addLoadEvent:function(func) {
         var oldonload = window.onload;
         if (typeof window.onload != 'function') {
           window.onload = func;
@@ -172,10 +174,8 @@ var ylkMonitor = (function () {
     }
 
     function performance$1(global, config, report) {
-
-
+        
         var g = global || window;
-
 
         g.onerror = function (msg, url, line, col, error) {
             var newMsg = msg;
@@ -205,7 +205,7 @@ var ylkMonitor = (function () {
 
         window.addEventListener('error', function(e) {
             e.stopImmediatePropagation();
-            const srcElement = e.srcElement;
+            var srcElement = e.srcElement;
             if (srcElement === window) ; else {
                 // 元素错误，比如引用资源报错
                 // console.log(e)
@@ -249,7 +249,7 @@ var ylkMonitor = (function () {
         random: 1,    // 抽样上报，1~0 之间数值，1为100%上报（默认 1）
         performanceReport: false,
         errorReport: false,
-        waitLoadTime:5,//五秒等待load触发，超时强行上报performance
+        waitLoadTime: 5,//五秒等待load触发，超时强行上报performance
     };
 
 
@@ -257,17 +257,23 @@ var ylkMonitor = (function () {
         init: function (global, config) {
             //merge配置
             var mergeConfig = utils.assignObject(_config, config);
-            // console.log(config)
-            var report = new Reporter(mergeConfig, global);
+            // 实例化上报器
+            var reporter = this.reporter = new Reporter(mergeConfig, global);
 
-        
-            performance(global,mergeConfig,report);
+            performance(global, mergeConfig, reporter);
 
-            performance$1(global,mergeConfig,report );
-            
-            // performance(global,config,report);
+            performance$1(global, mergeConfig, reporter);
+
         },
-        
+        // 加入队列上报
+        push: function (data) {
+            this.reporter.push(data);
+
+        },
+        // 跳过队列，直接上报
+        submit: function (data) {
+            this.reporter.submit([data]);
+        }
     };
 
     return ylkMonitor;

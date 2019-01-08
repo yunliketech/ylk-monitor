@@ -14,10 +14,6 @@ function Reporter(config, global) {
         this.submit_log.push(item);
         this.report();
     }
-    // item={
-    //     type:'performance/error/api/resource'
-    //     data
-    // }
 
     this.report = function () {
 
@@ -43,11 +39,13 @@ function Reporter(config, global) {
         }
     }
 
-    this.submit = function () {
+    this.submit = function (data_log) {
         var _this = this;
+        
         var data = {
             device: null,
-            log: this.submit_log,
+            
+            log: data_log?data_log:this.submit_log,//如果data_log存在，则直接上报，如果不存在，上报submit_log
             time: new Date().getTime()
         };
 
@@ -64,7 +62,11 @@ function Reporter(config, global) {
         //发送请求
         xhr.send(JSON.stringify(data));
 
-        _this.submit_log = []
+        if(!data_log){
+            // 清空队列
+           _this.submit_log = []
+        }
+        
         xhr.onreadystatechange = function () {
             // 这步为判断服务器是否正确响应
            

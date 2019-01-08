@@ -1,9 +1,7 @@
 import utils from "./utils";
 export default function performance(global, config, report) {
-
-
+    
     var g = global || window;
-
 
     g.onerror = function (msg, url, line, col, error) {
         var newMsg = msg;
@@ -33,7 +31,7 @@ export default function performance(global, config, report) {
 
     window.addEventListener('error', function(e) {
         e.stopImmediatePropagation();
-        const srcElement = e.srcElement;
+        var srcElement = e.srcElement;
         if (srcElement === window) {
             // 全局错误
             // console.log(e.message)

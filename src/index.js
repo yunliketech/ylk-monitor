@@ -5,10 +5,6 @@ import errorModule from './error'
 import utils from './utils'
 
 
-
-
-
-
 var _config = {
     id: '',  //上报id
     mergeReport: true, //mergeReport 是否合并上报， false 关闭， true 启动（默认）
@@ -19,7 +15,7 @@ var _config = {
     random: 1,    // 抽样上报，1~0 之间数值，1为100%上报（默认 1）
     performanceReport: false,
     errorReport: false,
-    waitLoadTime:5,//五秒等待load触发，超时强行上报performance
+    waitLoadTime: 5,//五秒等待load触发，超时强行上报performance
 }
 
 
@@ -27,17 +23,23 @@ var ylkMonitor = window.ylkMonitor = {
     init: function (global, config) {
         //merge配置
         var mergeConfig = utils.assignObject(_config, config)
-        // console.log(config)
-        var report = new Reporter(mergeConfig, global);
+        // 实例化上报器
+        var reporter = this.reporter = new Reporter(mergeConfig, global);
 
-    
-        performanceModule(global,mergeConfig,report);
+        performanceModule(global, mergeConfig, reporter);
 
-        errorModule(global,mergeConfig,report )
-        
-        // performance(global,config,report);
+        errorModule(global, mergeConfig, reporter)
+
     },
-    
+    // 加入队列上报
+    push: function (data) {
+        this.reporter.push(data)
+
+    },
+    // 跳过队列，直接上报
+    submit: function (data) {
+        this.reporter.submit([data])
+    }
 }
 
 
