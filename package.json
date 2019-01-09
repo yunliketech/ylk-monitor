@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "dev": "set NODE_ENV=dev &&rollup -c --watch",
-    "build": "set NODE_ENV=prod &&rollup -c"
+    "dev": "set NODE_ENV=dev&&rollup -c --watch",
+    "build": "set NODE_ENV=prod&&rollup -c"
   },
   "devDependencies": {
     "babel-preset-env": "^1.7.0",

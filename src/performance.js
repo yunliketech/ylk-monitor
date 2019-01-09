@@ -1,19 +1,19 @@
 import utils from "./utils";
 
 
-export default function performance(global, config, report) {
+export default function (global, config, report) {
 
-    if (!config.performanceReport) {
+    if(Math.random()>(config.performance.random||config.random)){
         return
     }
 
-    // 如果
+    // 是否完成onload
     var LOAD_COMPELETE = false;
+    // 是否已经上报了performance
     var PERFORMANCE_ISREPORT=false;
 
-
+    // 为onload添加回调
     utils.addLoadEvent(function () {
-        // console.log('load完成',PERFORMANCE_ISREPORT)
        if(!PERFORMANCE_ISREPORT){
             excutePerformance();
             LOAD_COMPELETE=true;
@@ -38,16 +38,15 @@ export default function performance(global, config, report) {
                 type: 'performance',
                 data: uglifyTiming,
             })
-            // console.log('上报性能', uglifyTiming);
             PERFORMANCE_ISREPORT=true;
             return uglifyTiming
         }
     }
-   
+    
+    // onload超时，不等待，上报performance
     setTimeout(function () {
         console.log(config.waitLoadTime,LOAD_COMPELETE)
         if(!LOAD_COMPELETE){
-            // console.log('load超时')
             excutePerformance();
         }
     }, config.waitLoadTime*1000)
