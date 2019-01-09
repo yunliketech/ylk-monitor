@@ -23,9 +23,18 @@ var _config = {
     waitLoadTime: 5,//五秒等待load触发，超时强行上报performance
 }
 
-
 var ylkMonitor = window.ylkMonitor = {
-    init: function (global, config) {
+    init: function (config) {
+        var global=window;
+        // 检查config必填项
+        if(!config.url){
+            console.warn('ylkMonitor options’s url is needed');
+            return
+        }
+        if(!config.id){
+            console.warn('ylkMonitor options’s id is needed');
+            return
+        }
         //merge配置
         if(config.performance===true){
             config.performance=_config.performance;
@@ -36,15 +45,13 @@ var ylkMonitor = window.ylkMonitor = {
             config.error.open=true;
         }
         var mergeConfig = utils.assignObject(_config, config)
-
         // 实例化上报器
         var reporter = this.reporter = new Reporter(mergeConfig, global);
-        
+        // 启动性能收集模块
         if(mergeConfig.performance){
             performanceModule(global, mergeConfig, reporter);
         }
-       
-
+         // 启动异常收集模块
         if(mergeConfig.error){
             errorModule(global, mergeConfig, reporter)
         }
@@ -54,14 +61,11 @@ var ylkMonitor = window.ylkMonitor = {
     // 加入队列上报
     push: function (data) {
         this.reporter.push(data)
-
     },
     // 跳过队列，直接上报
     submit: function (data) {
         this.reporter.submit([data])
     }
 }
-
-
 
 export default ylkMonitor;

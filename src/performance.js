@@ -2,7 +2,7 @@ import utils from "./utils";
 
 
 export default function (global, config, report) {
-
+    // 抽样判断
     if(Math.random()>(config.performance.random||config.random)){
         return
     }
@@ -27,13 +27,11 @@ export default function (global, config, report) {
             var timing = performance.timing;
             var uglifyTiming = {};
             for (var key in timing) {
-
                 if (typeof timing[key] === 'number') {
                     // uglifyTiming[key.substring(0,1)+key.replace(/[a-z]/g,'')]=(timing[key]+'').substring(5)
                     uglifyTiming[key] = (timing[key] + '').substring(6)
                 }
             }
-           
             report.push({
                 type: 'performance',
                 data: uglifyTiming,
