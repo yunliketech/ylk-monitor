@@ -4,9 +4,7 @@ function Reporter(config, global) {
 
     this.submit_log = [];
 
-    this._mergeReport = config.mergeReport;
 
-    this._delay = config.delay;
 
     this.merge_lock = false;;
 
@@ -19,15 +17,15 @@ function Reporter(config, global) {
 
         var _this = this;
 
-        // console.log('merge判断', this._mergeReport, this.submit_log.length > 0, !this.merge_lock)
-        if (this._mergeReport && this.submit_log.length > 0) {
+        // console.log('merge判断', config.mergeReport, this.submit_log.length > 0, !this.merge_lock)
+        if (config.mergeReport && this.submit_log.length > 0) {
             if (!this.merge_lock) {
                 _this.merge_lock = true;
 
                 setTimeout(function () {
                     _this.submit();
                     _this.merge_lock = false;
-                }, this._delay * 1000)
+                }, config.delay * 1000)
             }else{
                 // waiting上报
                 return
@@ -43,9 +41,9 @@ function Reporter(config, global) {
         var _this = this;
         
         var data = {
-            device: null,
-            
+            id:config.id,
             log: data_log?data_log:this.submit_log,//如果data_log存在，则直接上报，如果不存在，上报submit_log
+            device: null,
             time: new Date().getTime()
         };
 

@@ -1,6 +1,6 @@
 import utils from "./utils";
-export default function performance(global, config, report) {
-    
+export default function (global, config, report) {
+
     var g = global || window;
 
     g.onerror = function (msg, url, line, col, error) {
@@ -15,21 +15,22 @@ export default function performance(global, config, report) {
                 ("--" + newMsg.type + "--" + (newMsg.target ?
                     (newMsg.target.tagName + "::" + newMsg.target.src) : "")) : "";
         }
-
-        report.push({
-            type: 'error',
-            data: {
-                msg: newMsg,
-                target: url,
-                rowNum: line,
-                colNum: col,
-                _orgMsg: msg
-            }
-        });
+        if (Math.random() < (config.error.random || config.random)) {
+            report.push({
+                type: 'error',
+                data: {
+                    msg: newMsg,
+                    target: url,
+                    rowNum: line,
+                    colNum: col,
+                    _orgMsg: msg
+                }
+            });
+        }
     }
 
 
-    window.addEventListener('error', function(e) {
+    window.addEventListener('error', function (e) {
         e.stopImmediatePropagation();
         var srcElement = e.srcElement;
         if (srcElement === window) {
@@ -41,29 +42,31 @@ export default function performance(global, config, report) {
             // console.log(srcElement.tagName)
             // console.log(srcElement.src);
 
-
-            report.push({
-                type:'error',
-                data:{
-                    url:srcElement.src||srcElement.href,
-                    tag:srcElement.tagName,
-                }
-            })
+            if (Math.random() < (config.error.random || config.random)) {
+                report.push({
+                    type: 'error',
+                    data: {
+                        url: srcElement.src || srcElement.href,
+                        tag: srcElement.tagName,
+                    }
+                })
+            }
         }
     }, true)
 
 
 
-    window.addEventListener('unhandledrejection', function(e) {
+    window.addEventListener('unhandledrejection', function (e) {
         e.preventDefault();
-        console.log(e)// unhandledrejection
-
-        report.push({
-            type:'error',
-            data:{
-                msg:e.reason.message||"_",
-                stack:e.reason.stack||"_",
-            }
-        })
+        // console.log(e)// unhandledrejection
+        if (Math.random() < (config.error.random || config.random)) {
+            report.push({
+                type: 'error',
+                data: {
+                    msg: e.reason.message || "_",
+                    stack: e.reason.stack || "_",
+                }
+            })
+        }
     })
 }
