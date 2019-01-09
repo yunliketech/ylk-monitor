@@ -1,5 +1,8 @@
 import utils from "./utils";
-export default function (global, config, report) {
+
+
+
+export default function (global, config, reporter) {
 
     var g = global || window;
 
@@ -16,15 +19,12 @@ export default function (global, config, report) {
                     (newMsg.target.tagName + "::" + newMsg.target.src) : "")) : "";
         }
         if (Math.random() < (config.error.random || config.random)) {
-            report.push({
-                type: 'error',
-                data: {
-                    msg: newMsg,
-                    target: url,
-                    rowNum: line,
-                    colNum: col,
-                    _orgMsg: msg
-                }
+            errorPush({
+                msg: newMsg,
+                target: url,
+                rowNum: line,
+                colNum: col,
+                _orgMsg: msg
             });
         }
     }
@@ -43,12 +43,10 @@ export default function (global, config, report) {
             // console.log(srcElement.src);
 
             if (Math.random() < (config.error.random || config.random)) {
-                report.push({
-                    type: 'error',
-                    data: {
-                        url: srcElement.src || srcElement.href,
-                        tag: srcElement.tagName,
-                    }
+
+                errorPush({
+                    url: srcElement.src || srcElement.href,
+                    tag: srcElement.tagName,
                 })
             }
         }
@@ -60,13 +58,22 @@ export default function (global, config, report) {
         e.preventDefault();
         // console.log(e)// unhandledrejection
         if (Math.random() < (config.error.random || config.random)) {
-            report.push({
-                type: 'error',
-                data: {
-                    msg: e.reason.message || "_",
-                    stack: e.reason.stack || "_",
-                }
+
+            errorPush({
+                msg: e.reason.message || "_",
+                stack: e.reason.stack || "_",
             })
         }
     })
+
+    function errorPush(data) {
+        reporter.push({
+            type: 'error',
+            data: data,
+            hash: utils.hash(JSON.stringify(data))
+        })
+    }
+
 }
+
+

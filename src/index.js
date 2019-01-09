@@ -18,6 +18,7 @@ var _config = {
     error: {
         open:true,
         random:1,
+        repeat:5,  //一次访问，异常超过多少次，将不上报。
         ignore: [],
     },
     waitLoadTime: 5,//五秒等待load触发，超时强行上报performance
@@ -38,21 +39,23 @@ var ylkMonitor = window.ylkMonitor = {
         //merge配置
         if(config.performance===true){
             config.performance=_config.performance;
-            config.performance.open=true;
+        }else if(config.performance){
+            config.performance=utils.assignObject(_config.performance,config.performance)
         }
         if(config.error===true){
             config.error=_config.error;
-            config.error.open=true;
+        }else if(config.error){
+            config.error=utils.assignObject(_config.error,config.error)
         }
         var mergeConfig = utils.assignObject(_config, config)
         // 实例化上报器
         var reporter = this.reporter = new Reporter(mergeConfig, global);
         // 启动性能收集模块
-        if(mergeConfig.performance){
+        if(mergeConfig.performance===true||mergeConfig.performance.open===true){
             performanceModule(global, mergeConfig, reporter);
         }
          // 启动异常收集模块
-        if(mergeConfig.error){
+        if(mergeConfig.error===true||mergeConfig.error.open===true){
             errorModule(global, mergeConfig, reporter)
         }
         
