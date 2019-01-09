@@ -1,3 +1,7 @@
+
+var I64BIT_TABLE =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-'.split('');
+
 var utils = {
   assignObject: function (obj1, obj2) {
     for (var name in obj2) {
@@ -7,7 +11,7 @@ var utils = {
     }
     return obj1;
   },
-  addLoadEvent:function(func) {
+  addLoadEvent: function (func) {
     var oldonload = window.onload;
     if (typeof window.onload != 'function') {
       window.onload = func;
@@ -21,7 +25,7 @@ var utils = {
   isOBJByType: function (o, type) {
     return Object.prototype.toString.call(o) === "[object " + (type || "Object") + "]";
   },
-  processStackMsg:function(error) {
+  processStackMsg: function (error) {
     var stack = error.stack
       .replace(/\n/gi, "")
       .split(/\bat\b/)
@@ -34,6 +38,28 @@ var utils = {
     }
     return stack;
   },
+  hash: function (input) {
+    var hash = 5381;
+    var i = input.length - 1;
+
+    if (typeof input == 'string') {
+      for (; i > -1; i--)
+        hash += (hash << 5) + input.charCodeAt(i);
+    }
+    else {
+      for (; i > -1; i--)
+        hash += (hash << 5) + input[i];
+    }
+    var value = hash & 0x7FFFFFFF;
+
+    var retValue = '';
+    do {
+      retValue += I64BIT_TABLE[value & 0x3F];
+    }
+    while (value >>= 6);
+
+    return retValue;
+  }
 }
 
 
