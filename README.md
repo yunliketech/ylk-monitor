@@ -4,7 +4,16 @@
 
 ## 使用方法
 
-1.在html的head引入<script src="./build/ylkMonitor.js"></script> 
+1.在html的head引入ylkMonitor.js
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+   	...
+    <script src="./path/ylkMonitor.js"></script>
+</head>
+```
 
 2.初始化ylkMonitor
 
