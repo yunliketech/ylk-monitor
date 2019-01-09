@@ -9,8 +9,8 @@
     <title>Document</title>
     <script src="./build/ylkMonitor.js"></script>
     <script>
-        ylkMonitor.init(window, {
-            id: 1111,  //上报id
+        ylkMonitor.init( {
+            id: 1,  //上报id
             mergeReport: true, //mergeReport 是否合并上报， false 关闭， true 启动（默认）
             delay: 3,  // 当 mergeReport 为 true 可用，延迟多少毫秒，合并缓冲区中的上报（默认）
             url: 'http://127.0.0.1:5500',      // 指定错误上报地址
