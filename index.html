@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <script src="./build/ylkMonitor.js"></script>
+    <!-- <script src="./build/ylkMonitor.js"></script> -->
+    <script src="./dev/ylkMonitor-dev.js"></script>
     <script>
         ylkMonitor.init( {
             id: 1,  //上报id
@@ -21,6 +22,10 @@
             error: {
                 open:true
             }
+        });
+
+        ylkMonitor.on('beforeReport',function(msg){
+            console.log('beforeReport',msg)
         })
     </script>
     <link rel="stylesheet" href="http://127.0.0.1:5500/style.css">
@@ -69,5 +74,4 @@
         msg: "自定义直接上报"
     })
 </script>
-
 </html>

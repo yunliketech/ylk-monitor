@@ -1,7 +1,7 @@
 import utils from "./utils";
 
 
-export default function (global, config, report) {
+export default function (global, config, reporter) {
     // 抽样判断
     if(Math.random()>(config.performance.random||config.random)){
         return
@@ -32,7 +32,7 @@ export default function (global, config, report) {
                     uglifyTiming[key] = (timing[key] + '').substring(6)
                 }
             }
-            report.push({
+            reporter.submit({
                 type: 'performance',
                 data: uglifyTiming,
             })
