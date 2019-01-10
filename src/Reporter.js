@@ -6,14 +6,15 @@ function Reporter(config, global) {
 
     this.error_times = {}
 
-    this.merge_lock = false;;
+    this.merge_lock = false;
+
+    this.events = {};
 
     this.push = function (item) {
 
         var isRepeat = this.isRepeat(item);
 
         if (isRepeat) {
-
             return
         };
 
@@ -41,12 +42,12 @@ function Reporter(config, global) {
         }
     }
 
-    this.submit = function (data_log) {
+    this.submit = function (submitMsg) {
         var _this = this;
 
         var data = {
             id: config.id,
-            log: data_log ? data_log : this.submit_log,//如果data_log存在，则直接上报，如果不存在，上报submit_log
+            log: submitMsg ? [submitMsg] : this.submit_log,//如果data_log存在，则直接上报，如果不存在，上报submit_log
             device: null,
             time: new Date().getTime()
         };
@@ -60,11 +61,13 @@ function Reporter(config, global) {
         xhr.open('post', config.url);
         //post请求一定要添加请求头才行不然会报错
         xhr.setRequestHeader("Content-type", "application/json");
-
+        this.trigger('beforeReport',data)
         //发送请求
         xhr.send(JSON.stringify(data));
 
-        if (!data_log) {
+
+
+        if (!submitMsg) {
             // 清空队列
             _this.submit_log = []
         }
@@ -72,6 +75,7 @@ function Reporter(config, global) {
             // 这步为判断服务器是否正确响应
             if (xhr.readyState == 4 && xhr.status == 200) {
                 // console.log(xhr.responseText);
+                this.trigger('afterReport',data)
             }
         };
     }
@@ -87,6 +91,22 @@ function Reporter(config, global) {
             return config.error.repeat > 0 && times > config.error.repeat;
         } else {
             return false
+        }
+    }
+    // 触发
+    this.trigger = function (eventName, msg) {
+        if (this.events[eventName]&&this.events[eventName].length>0) {
+            this.events[eventName].forEach(function(func) {
+                func(msg)
+            });
+        }
+    }
+    // 绑定监听
+    this.on = function (eventName, func) {
+        if(!this.events[eventName]){
+            this.events[eventName]=[func]
+        }else{
+            this.events[eventName].push(func)
         }
     }
 }
