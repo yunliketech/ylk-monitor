@@ -20,18 +20,13 @@ describe('karma Test', function () {
         id: 1,
         url: 'http://localhost:9876/pathToMonitorServer'
       });
- 
-     
-
-  
-
     })
 
     it('Can trriger an errorReport', function (done) {
       ylkMonitor.on('beforeReport', function (msg) {
         msg.log.forEach(function (item) {
           if (item.type === 'error') {
-            console.log('准备上报一个error')
+            console.log('准备上报一个error');
             done()
           }
         })
@@ -44,10 +39,9 @@ describe('karma Test', function () {
 
     it('Can trriger a DiyReport', function (done) {
       ylkMonitor.on('beforeReport', function (msg) {
-        console.log('diy', msg)
         msg.log.forEach(function (item) {
           if (item.type === 'diy') {
-            // console.log('准备上报一个diy')
+            console.log('准备上报一个diy');
             done()
           }
         })
@@ -61,7 +55,6 @@ describe('karma Test', function () {
 
     it('Can trriger a performanceReport', function (done) {
       ylkMonitor.on('beforeReport', function (msg) {
-        console.log('per', msg)
         msg.log.forEach(function (item) {
           if (item.type === 'performance') {
             console.log('准备上报一个performance')

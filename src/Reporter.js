@@ -4,6 +4,8 @@ function Reporter(config, global) {
 
     this.submit_log = [];
 
+    this.baseInfo = null;
+
     this.error_times = {}
 
     this.merge_lock = false;
@@ -47,21 +49,28 @@ function Reporter(config, global) {
 
         var data = {
             id: config.id,
-            log: submitMsg ? [submitMsg] : this.submit_log,//如果data_log存在，则直接上报，如果不存在，上报submit_log
-            device: null,
+            log: submitMsg ? [submitMsg] : this.submit_log, //如果data_log存在，则直接上报，如果不存在，上报submit_log
+            baseInfo:null,
+            userInfo:null,
             time: new Date().getTime()
         };
+        // 携带基础信息
+        data.baseInfo = this.baseInfo ? this.baseInfo : this.getBaseInfo();
 
-        data.device = this.getDeviceInfo();
+        // 携带用户信息
+        if (this.config.userInfo instanceof Function) {
+            data.userInfo = this.config.userInfo()
+        } else if(typeof this.config.userInfo ==='string' ){
+            data.userInfo = this.config.userInfo
+        }
 
-        // console.log(data)
         var xhr = new XMLHttpRequest();
         //设置请求的类型及url
 
         xhr.open('post', config.url);
         //post请求一定要添加请求头才行不然会报错
         xhr.setRequestHeader("Content-type", "application/json");
-        this.trigger('beforeReport',data)
+        this.trigger('beforeReport', data)
         //发送请求
         xhr.send(JSON.stringify(data));
 
@@ -75,14 +84,26 @@ function Reporter(config, global) {
             // 这步为判断服务器是否正确响应
             if (xhr.readyState == 4 && xhr.status == 200) {
                 // console.log(xhr.responseText);
-                this.trigger('afterReport',data)
+                this.trigger('afterReport', data)
             }
         };
     }
 
-    this.getDeviceInfo = function () {
+
+
+    this.getBaseInfo = function () {
+        // 基础信息，每次上报都会携带，
         var g = global || window;
-        return g.navigator.userAgent;
+
+        var baseInfo = {
+            userAgent: g.navigator.userAgent,
+            deviceWidth: g.screen.width,
+            deviceHeight: g.screen.height,
+            url:g.location.href
+        }
+
+        this.baseInfo = baseInfo;
+        return baseInfo;
     }
 
     this.isRepeat = function (item) {
@@ -95,17 +116,17 @@ function Reporter(config, global) {
     }
     // 触发
     this.trigger = function (eventName, msg) {
-        if (this.events[eventName]&&this.events[eventName].length>0) {
-            this.events[eventName].forEach(function(func) {
+        if (this.events[eventName] && this.events[eventName].length > 0) {
+            this.events[eventName].forEach(function (func) {
                 func(msg)
             });
         }
     }
     // 绑定监听
     this.on = function (eventName, func) {
-        if(!this.events[eventName]){
-            this.events[eventName]=[func]
-        }else{
+        if (!this.events[eventName]) {
+            this.events[eventName] = [func]
+        } else {
             this.events[eventName].push(func)
         }
     }

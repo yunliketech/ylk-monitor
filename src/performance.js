@@ -6,7 +6,6 @@ export default function (global, config, reporter) {
     if(Math.random()>(config.performance.random||config.random)){
         return
     }
-
     // 是否完成onload
     var LOAD_COMPELETE = false;
     // 是否已经上报了performance
@@ -43,7 +42,7 @@ export default function (global, config, reporter) {
     
     // onload超时，不等待，上报performance
     setTimeout(function () {
-        console.log(config.waitLoadTime,LOAD_COMPELETE)
+       
         if(!LOAD_COMPELETE){
             excutePerformance();
         }

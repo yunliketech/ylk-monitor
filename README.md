@@ -93,7 +93,7 @@ ylkMonitor.on('aftereReport',function(msg){
 
 ## 测试相关
 
-**karma+mocha+chrome测试 **
+**karma+mocha+chrome测试**
 
 用例尚不完整
 

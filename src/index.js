@@ -6,7 +6,8 @@ import utils from './utils'
 
 
 var _config = {
-    id: '',  //上报id
+    id: '',  //项目id,
+    version:'',//项目版本
     mergeReport: true, //mergeReport 是否合并上报， false 关闭， true 启动（默认）
     delay: 1,  // 当 mergeReport 为 true 可用，延迟多少毫秒，合并缓冲区中的上报（默认）
     url: 'http://127.0.0.1:5500',      // 指定错误上报地址
@@ -22,13 +23,13 @@ var _config = {
         ignore: [],
     },
     waitLoadTime: 5,//五秒等待load触发，超时强行上报performance
+    userInfo:''//[string|function]
 }
 
 var ylkMonitor = window.ylkMonitor = {
     init: function (config) {
         var global = window;
         // 检查config必填项
-
         if (!config.url) {
             console.warn('ylkMonitor options’s url is needed');
             return
@@ -52,7 +53,6 @@ var ylkMonitor = window.ylkMonitor = {
         // 实例化上报器
         var reporter = this.reporter = new Reporter(mergeConfig, global, this.onSubmit);
         // 启动性能收集模块
-        console.log(mergeConfig.error && mergeConfig.error.open === true,mergeConfig)
         if (mergeConfig.performance && mergeConfig.performance.open === true) {
             performanceModule(global, mergeConfig, reporter);
         }

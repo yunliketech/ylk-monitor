@@ -7,6 +7,8 @@ var ylkMonitor = (function () {
 
         this.submit_log = [];
 
+        this.baseInfo = null;
+
         this.error_times = {};
 
         this.merge_lock = false;
@@ -49,21 +51,28 @@ var ylkMonitor = (function () {
 
             var data = {
                 id: config.id,
-                log: submitMsg ? [submitMsg] : this.submit_log,//如果data_log存在，则直接上报，如果不存在，上报submit_log
-                device: null,
+                log: submitMsg ? [submitMsg] : this.submit_log, //如果data_log存在，则直接上报，如果不存在，上报submit_log
+                baseInfo:null,
+                userInfo:null,
                 time: new Date().getTime()
             };
+            // 携带基础信息
+            data.baseInfo = this.baseInfo ? this.baseInfo : this.getBaseInfo();
 
-            data.device = this.getDeviceInfo();
+            // 携带用户信息
+            if (this.config.userInfo instanceof Function) {
+                data.userInfo = this.config.userInfo();
+            } else if(typeof this.config.userInfo ==='string' ){
+                data.userInfo = this.config.userInfo;
+            }
 
-            // console.log(data)
             var xhr = new XMLHttpRequest();
             //设置请求的类型及url
 
             xhr.open('post', config.url);
             //post请求一定要添加请求头才行不然会报错
             xhr.setRequestHeader("Content-type", "application/json");
-            this.trigger('beforeReport',data);
+            this.trigger('beforeReport', data);
             //发送请求
             xhr.send(JSON.stringify(data));
 
@@ -77,14 +86,26 @@ var ylkMonitor = (function () {
                 // 这步为判断服务器是否正确响应
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     // console.log(xhr.responseText);
-                    this.trigger('afterReport',data);
+                    this.trigger('afterReport', data);
                 }
             };
         };
 
-        this.getDeviceInfo = function () {
+
+
+        this.getBaseInfo = function () {
+            // 基础信息，每次上报都会携带，
             var g = global || window;
-            return g.navigator.userAgent;
+
+            var baseInfo = {
+                userAgent: g.navigator.userAgent,
+                deviceWidth: g.screen.width,
+                deviceHeight: g.screen.height,
+                url:g.location.href
+            };
+
+            this.baseInfo = baseInfo;
+            return baseInfo;
         };
 
         this.isRepeat = function (item) {
@@ -97,17 +118,17 @@ var ylkMonitor = (function () {
         };
         // 触发
         this.trigger = function (eventName, msg) {
-            if (this.events[eventName]&&this.events[eventName].length>0) {
-                this.events[eventName].forEach(function(func) {
+            if (this.events[eventName] && this.events[eventName].length > 0) {
+                this.events[eventName].forEach(function (func) {
                     func(msg);
                 });
             }
         };
         // 绑定监听
         this.on = function (eventName, func) {
-            if(!this.events[eventName]){
-                this.events[eventName]=[func];
-            }else{
+            if (!this.events[eventName]) {
+                this.events[eventName] = [func];
+            } else {
                 this.events[eventName].push(func);
             }
         };
@@ -181,7 +202,6 @@ var ylkMonitor = (function () {
         if(Math.random()>(config.performance.random||config.random)){
             return
         }
-
         // 是否完成onload
         var LOAD_COMPELETE = false;
         // 是否已经上报了performance
@@ -218,7 +238,7 @@ var ylkMonitor = (function () {
         
         // onload超时，不等待，上报performance
         setTimeout(function () {
-            console.log(config.waitLoadTime,LOAD_COMPELETE);
+           
             if(!LOAD_COMPELETE){
                 excutePerformance();
             }
@@ -298,7 +318,8 @@ var ylkMonitor = (function () {
     }
 
     var _config = {
-        id: '',  //上报id
+        id: '',  //项目id,
+        version:'',//项目版本
         mergeReport: true, //mergeReport 是否合并上报， false 关闭， true 启动（默认）
         delay: 1,  // 当 mergeReport 为 true 可用，延迟多少毫秒，合并缓冲区中的上报（默认）
         url: 'http://127.0.0.1:5500',      // 指定错误上报地址
@@ -314,13 +335,13 @@ var ylkMonitor = (function () {
             ignore: [],
         },
         waitLoadTime: 5,//五秒等待load触发，超时强行上报performance
+        userInfo:''//[string|function]
     };
 
     var ylkMonitor = window.ylkMonitor = {
         init: function (config) {
             var global = window;
             // 检查config必填项
-
             if (!config.url) {
                 console.warn('ylkMonitor options’s url is needed');
                 return
@@ -344,7 +365,6 @@ var ylkMonitor = (function () {
             // 实例化上报器
             var reporter = this.reporter = new Reporter(mergeConfig, global, this.onSubmit);
             // 启动性能收集模块
-            console.log(mergeConfig.error && mergeConfig.error.open === true,mergeConfig);
             if (mergeConfig.performance && mergeConfig.performance.open === true) {
                 performanceModule(global, mergeConfig, reporter);
             }
