@@ -29,7 +29,6 @@ ylkMonitor.init({
 
 
 
-
 ## 配置
 
 ```js
@@ -49,6 +48,7 @@ var _config = {
         ignore: [], //忽略的错误类型
     },
     waitLoadTime: 5,//五秒等待load触发，超时强行上报performance
+    userInfo:'uid123' //[string|Function]
 }
 ```
 
@@ -93,11 +93,87 @@ ylkMonitor.on('aftereReport',function(msg){
 
 ## 测试相关
 
-**karma+mocha+chrome测试 **
+**karma+mocha+chrome测试**
 
 用例尚不完整
 
 ```
 npm run test
+```
+
+
+
+## 上报格式
+
+性能上报
+
+```js
+
+{
+    "id": 1,
+    "log": [{
+        "type": "performance",
+        "data": {
+            "navigationStart": "5386175",
+            "unloadEventStart": "5386183",
+            "unloadEventEnd": "5386183",
+            "redirectStart": "",
+            "redirectEnd": "",
+            "fetchStart": "5386175",
+            "domainLookupStart": "5386175",
+            "domainLookupEnd": "5386175",
+            "connectStart": "5386175",
+            "connectEnd": "5386175",
+            "secureConnectionStart": "",
+            "requestStart": "5386178",
+            "responseStart": "5386179",
+            "responseEnd": "5386181",
+            "domLoading": "5386189",
+            "domInteractive": "5386224",
+            "domContentLoadedEventStart": "5386224",
+            "domContentLoadedEventEnd": "5386224",
+            "domComplete": "5386283",
+            "loadEventStart": "5386283",
+            "loadEventEnd": ""
+        }
+    }],
+    "baseInfo": {
+        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1",
+        "deviceWidth": 375,
+        "deviceHeight": 667,
+        "url": "http://127.0.0.1:5500/"
+    },
+    "userInfo": "uid123",
+    "time": 1548035386284
+}
+```
+
+
+
+异常上报
+
+```js
+{
+    "id": 1,
+    "log": [{
+        "type": "error",
+        "data": {
+            "msg": "TypeError: ylkMonitor.isNotFunc is not a function    @ http://127.0.0.1:5500/:89:20",
+            "target": "http://127.0.0.1:5500/",
+            "rowNum": 89,
+            "colNum": 20,
+            "_orgMsg": "Uncaught TypeError: ylkMonitor.isNotFunc is not a function"
+        },
+        "hash": "MiS_z"
+    }],
+    "baseInfo": {
+        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1",
+        "deviceWidth": 375,
+        "deviceHeight": 667,
+        "url": "http://127.0.0.1:5500/"
+    },
+    "userInfo": "uid123",
+    "time": 1548035395223
+}
 ```
 
